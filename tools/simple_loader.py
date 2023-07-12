@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import os
 import cv2
+from utils import image_io
 
 
 def collate_fn(list_data):
@@ -35,16 +36,17 @@ class ScanNetDataset(torch.utils.data.Dataset):
             dict of meta data and images for a single frame
         """
         id = self.id_list[id]
-        cam_pose = np.loadtxt(os.path.join(self.data_path, self.scene, "pose", str(id) + ".txt"), delimiter=' ')
+        cam_pose = np.loadtxt(os.path.join(self.data_path, self.scene, "pose", "{:06d}".format(id) + ".txt"), delimiter=' ')
 
         # Read depth image and camera pose
-        depth_im = cv2.imread(os.path.join(self.data_path, self.scene, "depth", str(id) + ".png"), -1).astype(
-            np.float32)
-        depth_im /= 1000.  # depth is saved in 16-bit PNG in millimeters
+        # depth_im = cv2.imread(os.path.join(self.data_path, self.scene, "depth", str(id) + ".png"), -1).astype(
+        #     np.float32)
+        # depth_im /= 1000.  # depth is saved in 16-bit PNG in millimeters
+        depth_im = image_io.load_pgm_image(os.path.join(self.data_path, self.scene, "depth", "{:06d}".format(id) + ".pgm")).astype(np.float32)       
         depth_im[depth_im > self.max_depth] = 0
 
         # Read RGB image
-        color_image = cv2.cvtColor(cv2.imread(os.path.join(self.data_path, self.scene, "color", str(id) + ".jpg")),
+        color_image = cv2.cvtColor(cv2.imread(os.path.join(self.data_path, self.scene, "color", "{:06d}".format(id) + ".jpg")),
                                    cv2.COLOR_BGR2RGB)
         color_image = cv2.resize(color_image, (depth_im.shape[1], depth_im.shape[0]), interpolation=cv2.INTER_AREA)
 

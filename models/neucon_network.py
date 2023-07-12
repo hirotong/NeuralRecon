@@ -6,7 +6,7 @@ from torchsparse.tensor import PointTensor
 from loguru import logger
 
 from models.modules import SPVCNN
-from utils import apply_log_transform
+from utils_back import apply_log_transform
 from .gru_fusion import GRUFusion
 from ops.back_project import back_project
 from ops.generate_grids import generate_grid
